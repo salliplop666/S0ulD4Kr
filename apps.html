@@ -11,8 +11,7 @@
         .app-btn { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             padding: 20px; border-radius: 10px; text-decoration: none; color: white; 
-            font-weight: 600; transition: 0.3s; cursor: pointer; border: none; 
-            text-align: center;
+            font-weight: 600; transition: 0.3s; cursor: pointer; border: none; text-align: center;
         }
         .app-btn:hover { transform: scale(1.05); }
         .app-btn i { font-size: 30px; margin-bottom: 10px; }
@@ -22,24 +21,53 @@
         .app-3 { background: #2ecc71; }
         .app-4 { background: #f39c12; }
 
-        /* Estilos del Modal Iframe */
-        .modal-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.9); z-index: 9999; 
-            justify-content: center; align-items: center; 
+        /* Estilos de las Ventanas Flotantes */
+        .window {
+            position: fixed; 
+            top: 10%; left: 10%; 
+            width: 80%; height: 70%; 
+            background: #0a0a0a; 
+            border: 2px solid #6c5ce7; 
+            border-radius: 10px; 
+            z-index: 1000; 
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            resize: both; overflow: hidden;
+            min-width: 300px; min-height: 200px;
         }
-        .modal-overlay.active { display: flex; }
-        .modal-content { 
-            width: 95%; height: 95%; background: #0a0a0a; border-radius: 10px; 
-            position: relative; overflow: hidden; border: 2px solid #6c5ce7; 
+        .window-header {
+            background: #1a1a1a; 
+            padding: 10px; 
+            cursor: move; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px solid #333;
+            user-select: none;
         }
-        .modal-close { 
-            position: absolute; top: 10px; right: 15px; background: #e74c3c; 
-            color: white; border: none; padding: 8px 15px; border-radius: 5px; 
-            cursor: pointer; font-weight: bold; z-index: 10000; font-size: 14px; 
+        .window-title { color: white; font-weight: bold; font-size: 14px; }
+        .window-controls button {
+            background: transparent; border: none; color: white; cursor: pointer; 
+            font-size: 16px; margin-left: 10px;
         }
-        .modal-close:hover { background: #c0392b; }
-        .modal-content iframe { width: 100%; height: 100%; border: none; }
+        .window-controls .minimize:hover { color: #f1c40f; }
+        .window-controls .close:hover { color: #e74c3c; }
+        .window-content { flex-grow: 1; border: none; width: 100%; height: 100%; }
+        
+        /* Barra de tareas (Apps minimizadas) */
+        .taskbar {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: #1a1a1a; display: flex; padding: 5px; gap: 10px; 
+            border-top: 2px solid #6c5ce7; z-index: 2000;
+        }
+        .taskbar-item {
+            background: #333; color: white; padding: 5px 15px; border-radius: 5px; 
+            cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px;
+        }
+        .taskbar-item:hover { background: #6c5ce7; }
+        
+        /* Ocultar barra de tareas si no hay apps minimizadas */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -53,25 +81,18 @@
         <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Selecciona la aplicación que deseas abrir.</p>
 
         <div class="app-grid">
-            <!-- APP 1: SMTP Checker -->
-            <button class="app-btn app-1" onclick="openApp('https://souldakr-io.onrender.com/')">
+            <button class="app-btn app-1" onclick="openWindow('smtp', 'SMTP Checker', 'https://souldakr-io.onrender.com/')">
                 <i class="fas fa-envelope"></i>
                 <span>SMTP Checker</span>
             </button>
-
-            <!-- APP 2: Checker Stripe -->
-            <button class="app-btn app-2" onclick="openApp('https://checkercc-7s1r.onrender.com/')">
+            <button class="app-btn app-2" onclick="openWindow('stripe', 'Checker Stripe', 'https://checkercc-7s1r.onrender.com/')">
                 <i class="fas fa-credit-card"></i>
                 <span>Checker Stripe</span>
             </button>
-
-            <!-- APP 3: Próximamente -->
             <button class="app-btn app-3" onclick="alert('App 3 próximamente...')">
                 <i class="fas fa-gamepad"></i>
                 <span>App 3</span>
             </button>
-
-            <!-- APP 4: Próximamente -->
             <button class="app-btn app-4" onclick="alert('App 4 próximamente...')">
                 <i class="fas fa-globe"></i>
                 <span>App 4</span>
@@ -83,19 +104,18 @@
         </div>
     </div>
 
-    <!-- Modal para el Iframe -->
-    <div id="app-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeApp()">✖ Cerrar</button>
-            <iframe id="app-iframe" src="about:blank"></iframe>
-        </div>
-    </div>
+    <!-- Contenedor de Ventanas -->
+    <div id="windows-container"></div>
+    
+    <!-- Barra de Tareas -->
+    <div id="taskbar" class="taskbar hidden"></div>
 
     <script type="module">
         import { checkUserAccess, checkSession } from './i.js';
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         
         const auth = getAuth();
+        let windowCount = 0;
 
         // Bloqueo de inspección
         document.addEventListener('contextmenu', e => e.preventDefault());
@@ -104,38 +124,107 @@
         });
 
         onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            // Verificar sesión única
+            if (!user) { window.location.href = 'login.html'; return; }
             checkSession();
-
-            // Verificar plan
             const status = await checkUserAccess();
-            
             if (!status || (!status.hasPlan && !status.isAdmin)) {
-                alert('No tienes un plan activo. Por favor, compra un plan para acceder.');
-                window.location.href = 'plan.html';
+                alert('No tienes un plan activo.'); window.location.href = 'plan.html';
             }
         });
 
-        // Abrir la app DENTRO de la web (iframe)
-        window.openApp = (url) => {
-            const modal = document.getElementById('app-modal');
-            const iframe = document.getElementById('app-iframe');
-            iframe.src = url;
-            modal.classList.add('active');
+        // Función para crear una ventana flotante
+        window.openWindow = (id, title, url) => {
+            // Si ya existe, la traemos al frente
+            const existing = document.getElementById(`win-${id}`);
+            if (existing) {
+                existing.style.display = 'flex';
+                existing.style.zIndex = ++windowCount;
+                return;
+            }
+
+            const win = document.createElement('div');
+            win.id = `win-${id}`;
+            win.className = 'window';
+            win.style.zIndex = ++windowCount;
+            
+            // Posición aleatoria para que no se superpongan exactamente
+            win.style.top = `${10 + (windowCount * 2)}%`;
+            win.style.left = `${10 + (windowCount * 2)}%`;
+
+            win.innerHTML = `
+                <div class="window-header" onmousedown="startDrag(event, 'win-${id}')">
+                    <span class="window-title">${title}</span>
+                    <div class="window-controls">
+                        <button class="minimize" onclick="minimizeWindow('win-${id}')"><i class="fas fa-minus"></i></button>
+                        <button class="close" onclick="closeWindow('win-${id}')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <iframe class="window-content" src="${url}"></iframe>
+            `;
+            document.getElementById('windows-container').appendChild(win);
         };
 
-        // Cerrar la app
-        window.closeApp = () => {
-            const modal = document.getElementById('app-modal');
-            const iframe = document.getElementById('app-iframe');
-            iframe.src = 'about:blank'; // Limpiar el iframe para detener la app
-            modal.classList.remove('active');
+        // Minimizar ventana
+        window.minimizeWindow = (id) => {
+            const win = document.getElementById(id);
+            if (win) win.style.display = 'none';
+            
+            // Agregar a la barra de tareas si no está
+            const taskbar = document.getElementById('taskbar');
+            if (!document.getElementById(`task-${id}`)) {
+                const task = document.createElement('div');
+                task.id = `task-${id}`;
+                task.className = 'taskbar-item';
+                task.innerHTML = `<i class="fas fa-window-restore"></i> ${id.replace('win-', '')}`;
+                task.onclick = () => {
+                    win.style.display = 'flex';
+                    win.style.zIndex = ++windowCount;
+                    task.remove();
+                    if (taskbar.children.length === 0) taskbar.classList.add('hidden');
+                };
+                taskbar.appendChild(task);
+                taskbar.classList.remove('hidden');
+            }
         };
+
+        // Cerrar ventana
+        window.closeWindow = (id) => {
+            const win = document.getElementById(id);
+            if (win) win.remove();
+            const task = document.getElementById(`task-${id}`);
+            if (task) {
+                task.remove();
+                if (document.getElementById('taskbar').children.length === 0) {
+                    document.getElementById('taskbar').classList.add('hidden');
+                }
+            }
+        };
+
+        // Lógica de arrastre (Drag)
+        let dragTarget = null;
+        let offsetX = 0, offsetY = 0;
+
+        window.startDrag = (e, id) => {
+            dragTarget = document.getElementById(id);
+            dragTarget.style.zIndex = ++windowCount;
+            offsetX = e.clientX - dragTarget.getBoundingClientRect().left;
+            offsetY = e.clientY - dragTarget.getBoundingClientRect().top;
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+            e.preventDefault();
+        };
+
+        function drag(e) {
+            if (!dragTarget) return;
+            dragTarget.style.left = `${e.clientX - offsetX}px`;
+            dragTarget.style.top = `${e.clientY - offsetY}px`;
+        }
+
+        function stopDrag() {
+            dragTarget = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
     </script>
 </body>
 </html>

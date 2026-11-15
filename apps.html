@@ -94,10 +94,15 @@
             }
         });
 
-        // Función para abrir la app en una VENTANA EMERGENTE (oculta el link de Render)
+        // Función para abrir la app en una VENTANA EMERGENTE (sin barra de direcciones si el navegador lo permite)
         window.openApp = (url) => {
-            // Abre una ventana emergente sin barra de direcciones
-            window.open(url, '_blank', 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
+            // Intentar abrir una ventana sin barra de direcciones
+            const win = window.open(url, '_blank', 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
+            
+            // Si el navegador bloquea la ventana emergente, mostrar un aviso
+            if (!win) {
+                alert('Por favor, permite las ventanas emergentes para abrir la aplicación.');
+            }
         };
     </script>
 </body>

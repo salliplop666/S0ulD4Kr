@@ -33,9 +33,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, deleteField, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ⚠️ CONFIGURACIÓN (API Key válida)
+// ⚠️ CONFIGURACIÓN CORREGIDA CON LA API KEY DE TU CAPTURA
 const firebaseConfig = {
-    apiKey: "AIzaSyCgCnuA4ehtQFJywPAMLVuxlSeuLfL8b0",
+    apiKey: "AIzaSyCtnAU4ehtqFjywPAMVLuxtSealufILeb0",
     authDomain: "s0uld4kr11-11.firebaseapp.com",
     projectId: "s0uld4kr11-11",
     storageBucket: "s0uld4kr11-11.firebasestorage.app",
@@ -225,7 +225,7 @@ export async function getUserInfo() {
     }
 }
 
-// --- REGISTRO (CON ESPERA PARA AUTENTICACIÓN) ---
+// --- REGISTRO ---
 export async function registerUser() {
     const name = document.getElementById('reg-name').value;
     const code = document.getElementById('reg-country-code').value;
@@ -253,17 +253,15 @@ export async function registerUser() {
         }
 
         btn.textContent = 'Creando cuenta...';
-        // 1. Crear el usuario en Auth (await asegura que termine)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
 
-        // 2. Pequeña espera para que Firestore reconozca la sesión
+        // Espera para que Firestore reconozca la sesión
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         const emailCode = Math.floor(100000 + Math.random() * 900000).toString();
         const whatsappCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // 3. Ahora sí, escribir en Firestore
         await setDoc(doc(db, "users", user.uid), {
             name: name, phone: fullPhone, email: email, role: "user",
             emailVerified: false, verificationCode: emailCode, whatsappCode: whatsappCode,

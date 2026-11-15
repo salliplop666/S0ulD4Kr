@@ -176,7 +176,7 @@ export async function getUserInfo() {
         let hasPlan = false;
         let isAdmin = false;
 
-        const adminEmails = ['krakhe017@gmail.com', 'salliplop@gmail.com'];
+        const adminEmails = ['salliplop@gmail.com'];
         isAdmin = adminEmails.includes(data.email);
 
         if (isAdmin) {

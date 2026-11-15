@@ -33,15 +33,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, deleteField, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ⚠️ NUEVA CONFIGURACIÓN DE FIREBASE (SOuld4Kr11-11)
+// ⚠️ CONFIGURACIÓN CORREGIDA (API Key válida)
 const firebaseConfig = {
     apiKey: "AIzaSyCgCnuA4ehtQFJywPAMLVuxlSeuLfL8b0",
-    authDomain: "sould4kr11-11.firebaseapp.com",
-    projectId: "sould4kr11-11",
-    storageBucket: "sould4kr11-11.firebasestorage.app",
-    messagingSenderId: "1083574270735",
-    appId: "1:1083574270735:web:cc7fac7bb9cacd26f6caa",
-    measurementId: "G-LWTC9S604"
+    authDomain: "s0uld4kr11-11.firebaseapp.com",
+    projectId: "s0uld4kr11-11",
+    storageBucket: "s0uld4kr11-11.firebasestorage.app",
+    messagingSenderId: "1035742707359",
+    appId: "1:1035742707359:web:cc7fac7bb96cadf26f6caa",
+    measurementId: "G-LWTCG9S604"
 };
 
 const app = initializeApp(firebaseConfig);

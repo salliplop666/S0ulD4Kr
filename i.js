@@ -225,7 +225,7 @@ export async function getUserInfo() {
     }
 }
 
-// --- REGISTRO ---
+// --- REGISTRO (CON RETRASO PARA AUTENTICACIÓN) ---
 export async function registerUser() {
     const name = document.getElementById('reg-name').value;
     const code = document.getElementById('reg-country-code').value;
@@ -255,6 +255,9 @@ export async function registerUser() {
         btn.textContent = 'Creando cuenta...';
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
+
+        // --- ESPERA CRÍTICA PARA QUE FIREBASE AUTH ESTÉ LISTO ---
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         const emailCode = Math.floor(100000 + Math.random() * 900000).toString();
         const whatsappCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -287,7 +290,7 @@ export async function registerUser() {
     }
 }
 
-// --- LOGIN CON CONTADOR DE INTENTOS Y ADVERTENCIA (SIEMPRE MUESTRA ADVERTENCIA) ---
+// --- LOGIN CON CONTADOR DE INTENTOS Y ADVERTENCIA ---
 export async function loginUser() {
     const code = document.getElementById('login-country-code').value;
     const phone = document.getElementById('login-phone').value.replace(/\s+/g, '');
@@ -333,7 +336,6 @@ export async function loginUser() {
             return;
         }
 
-        // --- LÓGICA DE ADVERTENCIA DE SESIÓN ABIERTA ---
         const currentToken = sessionStorage.getItem('sessionToken');
         const activeToken = userData.activeSessionToken;
 

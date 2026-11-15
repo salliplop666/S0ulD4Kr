@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<script>
+    // Bloquear clic derecho
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // Bloquear atajos de teclado (F12, Ctrl+Shift+I, Ctrl+U, etc.)
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+        // Ctrl+Shift+I
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
+        // Ctrl+Shift+J
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
+        // Ctrl+Shift+C
+        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+        // Ctrl+U
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
+    });
+
+    // Bloquear selección de texto
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecciona tu plan - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <div class="card-container page-wide">
+        <div class="top-bar">
+            <a href="dashboard.html" class="btn-back"><i class="fas fa-home"></i> Regresar</a>
+            <button class="btn-profile"><i class="fas fa-user-circle"></i> Perfil</button>
+        </div>
+
+        <div class="banner">
+            <div><i class="fas fa-user-plus"></i> <strong>Refiere a un amigo</strong> y obtén días gratis</div>
+            <i class="fas fa-arrow-circle-right" style="cursor: pointer;"></i>
+        </div>
+
+        <h2>Selecciona tu plan</h2>
+
+        <div class="plan-grid">
+            <div class="plan-card active" onclick="selectPlan(this, 1, 9.99)">
+                <i class="fas fa-crown"></i><div class="days">1 día</div><div class="price">$9.99</div><i class="fas fa-check-circle check-icon"></i>
+            </div>
+            <div class="plan-card" onclick="selectPlan(this, 3, 19.99)">
+                <i class="fas fa-crown"></i><div class="days">3 días</div><div class="price">$19.99</div><i class="fas fa-check-circle check-icon"></i>
+            </div>
+            <div class="plan-card" onclick="selectPlan(this, 7, 24.99)">
+                <i class="fas fa-crown"></i><div class="days">7 días</div><div class="price">$24.99</div><i class="fas fa-check-circle check-icon"></i>
+            </div>
+            <div class="plan-card" onclick="selectPlan(this, 14, 44.99)">
+                <i class="fas fa-crown"></i><div class="days">14 días</div><div class="price">$44.99</div><i class="fas fa-check-circle check-icon"></i>
+            </div>
+            <div class="plan-card full-width" onclick="selectPlan(this, 30, 79.99)">
+                <i class="fas fa-crown" style="color: gold;"></i><div class="days">30 días</div><div class="price">$79.99</div><i class="fas fa-check-circle check-icon"></i>
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="goToPayment()" style="margin-top: 30px;">Continuar <i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <script>
+        let selectedPlan = { days: 1, price: 9.99 };
+        function selectPlan(element, days, price) {
+            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            selectedPlan = { days, price };
+        }
+        function goToPayment() {
+            localStorage.setItem('selectedPlan', JSON.stringify(selectedPlan));
+            window.location.href = 'pago.html';
+        }
+    </script>
+</body>
+</html>

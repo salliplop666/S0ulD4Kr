@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completa tu pago - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <div class="card-container page-wide">
+        <div class="top-bar">
+            <a href="plan.html" class="btn-back"><i class="fas fa-arrow-left"></i> Volver</a>
+            <button class="btn-profile"><i class="fas fa-user-circle"></i> Perfil</button>
+        </div>
+
+        <h2>Completa tu pago</h2>
+
+        <div class="summary-box">
+            <div>Tipo de Plan: <span id="summary-days">1 día</span></div>
+            <div>Total: <span id="summary-price">$9.99</span></div>
+        </div>
+
+        <div class="crypto-options">
+            <div class="crypto-btn active" onclick="selectCrypto('BTC', this)">Bitcoin</div>
+            <div class="crypto-btn" onclick="selectCrypto('ETH', this)">Ethereum</div>
+            <div class="crypto-btn" onclick="selectCrypto('LTC', this)">Litecoin</div>
+            <div class="crypto-btn" onclick="selectCrypto('XMR', this)">Monero</div>
+        </div>
+
+        <div id="payment-details" class="hidden">
+            <div class="timer" id="timer">15:00</div>
+            
+            <div class="qr-container">
+                <img id="qr-image" src="" alt="QR Code">
+                <p>Escanea o copia la dirección:</p>
+                <div class="wallet-address" id="wallet-address"></div>
+                <button class="btn-submit" onclick="copyAddress()" style="padding: 8px; font-size: 14px; margin-top: 0;">Copiar Dirección</button>
+            </div>
+
+            <!-- Sección de datos del pago (sin imagen) -->
+            <div class="upload-section" style="border-style: solid; border-color: #ddd;">
+                <p><strong>Ingresa los datos de tu pago</strong></p>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Una vez realizado el pago, ingresa los datos que te dio tu banco o exchange.</p>
+                
+                <div class="input-group" style="text-align: left;">
+                    <label>Número de Referencia</label>
+                    <input type="text" id="ref-input" placeholder="Ej: 123456789">
+                </div>
+                <div class="input-group" style="text-align: left;">
+                    <label>Fecha del Pago</label>
+                    <input type="date" id="date-input">
+                </div>
+                <div class="input-group" style="text-align: left;">
+                    <label>Hora del Pago</label>
+                    <input type="time" id="time-input">
+                </div>
+            </div>
+
+            <button class="btn-submit" id="submit-payment" onclick="submitPayment()" style="margin-top: 20px;">Enviar Comprobante</button>
+        </div>
+    </div>
+
+    <a href="https://t.me/souldakr" target="_blank" class="telegram-float" title="Contactar por Telegram">
+        <i class="fab fa-telegram-plane"></i>
+    </a>
+
+    <script type="module">
+        import { initPaymentPage } from './i.js';
+        document.addEventListener('DOMContentLoaded', () => { initPaymentPage(); });
+    </script>
+</body>
+</html>

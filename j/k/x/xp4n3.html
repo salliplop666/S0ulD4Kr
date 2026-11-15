@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Restringido</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../estilos.css">
+    <style>
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+        .admin-table th, .admin-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .admin-table th { background-color: #f8f9fa; font-weight: 600; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card-container page-wide" style="max-width: 1000px;">
+        
+        <div id="login-screen">
+            <div class="logo-header" style="color: #e74c3c;"><i class="fas fa-lock"></i> Acceso Restringido</div>
+            <h2>Panel de Administración</h2>
+            <div class="input-group">
+                <label>Correo de Administrador</label>
+                <input type="email" id="admin-email-input" placeholder="admin@correo.com">
+            </div>
+            <button class="btn-submit" onclick="checkAdminLogin()">Acceder</button>
+            <div id="login-message" class="message"></div>
+        </div>
+
+        <div id="panel-screen" class="hidden">
+            <div class="top-bar">
+                <a href="../../../dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Volver</a>
+                <button class="btn-profile" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
+
+            <h2>Historial de Transacciones</h2>
+            <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Aquí se muestran todos los pagos realizados por los usuarios.</p>
+            
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Plan</th>
+                        <th>Monto</th>
+                        <th>Referencia</th>
+                        <th>Fecha Pago</th>
+                        <th>Fecha Registro</th>
+                        <th>Estado / Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-table-body">
+                    <tr><td colspan="7" style="text-align:center;">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { loadAdminPayments, approvePayment, rejectPayment, logoutUser, verifyAdminEmail } from '../../../i.js';
+        
+        window.logoutUser = logoutUser;
+        window.approvePayment = approvePayment;
+        window.rejectPayment = rejectPayment;
+
+        window.checkAdminLogin = async () => {
+            const email = document.getElementById('admin-email-input').value.trim();
+            const msgBox = document.getElementById('login-message');
+
+            if (!email) {
+                msgBox.textContent = 'Por favor, ingresa un correo.';
+                msgBox.className = 'message error';
+                return;
+            }
+
+            const isAllowed = await verifyAdminEmail(email);
+
+            if (isAllowed) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('panel-screen').classList.remove('hidden');
+                loadAdminPayments();
+            } else {
+                msgBox.textContent = 'Acceso denegado.';
+                msgBox.className = 'message error';
+            }
+        };
+    </script>
+</body>
+</html>

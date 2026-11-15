@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Cuenta - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <div class="card-container">
+        <div class="header-brand">
+            <img src="logo.png" alt="Logo Souldakr">
+            <span>Souldakr.io</span>
+        </div>
+
+        <h2>Confirma tu cuenta</h2>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px; text-align: center;">
+            Ingresa el código enviado a tu correo y el código que recibiste por WhatsApp.
+        </p>
+        <p id="email-display" style="font-size: 13px; font-weight: bold; color: #333; margin-bottom: 20px; text-align: center;"></p>
+
+        <div class="input-group">
+            <label>Código de Correo Electrónico</label>
+            <input type="text" id="confirm-email-code" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 5px;">
+        </div>
+
+        <div class="input-group">
+            <label>Código de WhatsApp</label>
+            <input type="text" id="confirm-whatsapp-code" placeholder="000000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 5px;">
+        </div>
+
+        <button class="btn-submit" id="confirm-btn">Confirmar cuenta</button>
+        <div class="links" style="margin-top: 25px;"><a href="login.html">Regresar al inicio</a></div>
+        <div id="message-box" class="message"></div>
+    </div>
+
+    <script type="module">
+        import { confirmUserCode } from './i.js';
+        
+        const email = sessionStorage.getItem('verify_email');
+        if (email) document.getElementById('email-display').textContent = `Código de correo enviado a: ${email}`;
+
+        document.getElementById('confirm-btn').addEventListener('click', confirmUserCode);
+    </script>
+</body>
+</html>

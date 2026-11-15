@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Aplicaciones - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+    <style>
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .app-btn { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 20px; border-radius: 10px; text-decoration: none; color: white; 
+            font-weight: 600; transition: 0.3s; cursor: pointer; border: none; 
+            text-align: center;
+        }
+        .app-btn:hover { transform: scale(1.05); }
+        .app-btn i { font-size: 30px; margin-bottom: 10px; }
+        .app-btn span { font-size: 14px; }
+        .app-1 { background: #3498db; }
+        .app-2 { background: #e74c3c; }
+        .app-3 { background: #2ecc71; }
+        .app-4 { background: #f39c12; }
+
+        /* Estilos del Modal Iframe */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.9); z-index: 9999; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content { 
+            width: 95%; height: 95%; background: #0a0a0a; border-radius: 10px; 
+            position: relative; overflow: hidden; border: 2px solid #6c5ce7; 
+        }
+        .modal-close { 
+            position: absolute; top: 10px; right: 15px; background: #e74c3c; 
+            color: white; border: none; padding: 8px 15px; border-radius: 5px; 
+            cursor: pointer; font-weight: bold; z-index: 10000; font-size: 14px; 
+        }
+        .modal-close:hover { background: #c0392b; }
+        .modal-content iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+    <div class="card-container" style="text-align: center;">
+        <div class="header-brand">
+            <img src="logo.png" alt="Logo Souldakr">
+            <span>Souldakr.io</span>
+        </div>
+
+        <h2>Mis Aplicaciones</h2>
+        <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Selecciona la aplicación que deseas abrir.</p>
+
+        <div class="app-grid">
+            <!-- APP 1: SMTP Checker -->
+            <button class="app-btn app-1" onclick="openApp('https://souldakr-io.onrender.com/')">
+                <i class="fas fa-envelope"></i>
+                <span>SMTP Checker</span>
+            </button>
+
+            <!-- APP 2: Checker Stripe -->
+            <button class="app-btn app-2" onclick="openApp('https://checkercc-7s1r.onrender.com/')">
+                <i class="fas fa-credit-card"></i>
+                <span>Checker Stripe</span>
+            </button>
+
+            <!-- APP 3: Próximamente -->
+            <button class="app-btn app-3" onclick="alert('App 3 próximamente...')">
+                <i class="fas fa-gamepad"></i>
+                <span>App 3</span>
+            </button>
+
+            <!-- APP 4: Próximamente -->
+            <button class="app-btn app-4" onclick="alert('App 4 próximamente...')">
+                <i class="fas fa-globe"></i>
+                <span>App 4</span>
+            </button>
+        </div>
+
+        <div class="links" style="margin-top: 30px;">
+            <a href="dashboard.html">Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Modal para el Iframe -->
+    <div id="app-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeApp()">✖ Cerrar</button>
+            <iframe id="app-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkUserAccess, checkSession } from './i.js';
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        const auth = getAuth();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Verificar sesión única
+            checkSession();
+
+            // Verificar plan
+            const status = await checkUserAccess();
+            
+            if (!status || (!status.hasPlan && !status.isAdmin)) {
+                alert('No tienes un plan activo. Por favor, compra un plan para acceder.');
+                window.location.href = 'plan.html';
+            }
+        });
+
+        // Abrir la app DENTRO de la web (iframe)
+        window.openApp = (url) => {
+            const modal = document.getElementById('app-modal');
+            const iframe = document.getElementById('app-iframe');
+            iframe.src = url;
+            modal.classList.add('active');
+        };
+
+        // Cerrar la app
+        window.closeApp = () => {
+            const modal = document.getElementById('app-modal');
+            const iframe = document.getElementById('app-iframe');
+            iframe.src = 'about:blank'; // Limpiar el iframe para detener la app
+            modal.classList.remove('active');
+        };
+    </script>
+</body>
+</html>

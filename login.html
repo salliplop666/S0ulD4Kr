@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <div class="card-container">
+        <!-- Encabezado con logo.png y texto negro unificado -->
+        <div class="header-brand">
+            <img src="logo.png" alt="Logo Souldakr">
+            <span>Souldakr.io</span>
+        </div>
+        
+        <h2>Iniciar Sesión</h2>
+
+        <div class="input-group">
+            <label>Número de Teléfono</label>
+            <div class="phone-container">
+                <select id="login-country-code">
+                    <option value="+1">+1</option>
+                    <option value="+54">+54</option>
+                    <option value="+57">+57</option>
+                    <option value="+58">+58</option>
+                    <option value="+52">+52</option>
+                    <option value="+34">+34</option>
+                </select>
+                <input type="tel" id="login-phone" placeholder="Número de teléfono">
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Contraseña</label>
+            <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+
+        <button class="btn-submit" id="login-btn">Ingresar</button>
+        <div class="links">
+            ¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a>
+            <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div id="message-box" class="message"></div>
+    </div>
+
+    <script type="module">
+        import { loginUser } from './i.js';
+        document.getElementById('login-btn').addEventListener('click', loginUser);
+    </script>
+</body>
+</html>

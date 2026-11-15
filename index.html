@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<script>
+    // Bloquear clic derecho
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // Bloquear atajos de teclado (F12, Ctrl+Shift+I, Ctrl+U, etc.)
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) { e.preventDefault(); return false; }
+        // Ctrl+Shift+I
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
+        // Ctrl+Shift+J
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
+        // Ctrl+Shift+C
+        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); return false; }
+        // Ctrl+U
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
+    });
+
+    // Bloquear selección de texto
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <div class="card-container">
+        <div class="welcome-logo-vertical">
+            <img src="logo.png" alt="Logo Souldakr" class="brand-logo">
+            <h1 class="brand-title">Souldakr.io</h1>
+        </div>
+        
+        <div class="welcome-buttons">
+            <a href="login.html" class="btn-login">Inicia sesión</a>
+            <a href="registro.html" class="btn-register">Crea tu cuenta</a>
+        </div>
+        
+        <div class="welcome-footer">
+            <a href="#">Términos de Servicio</a>
+            <a href="#">Política de Privacidad</a>
+        </div>
+    </div>
+</body>
+</html>

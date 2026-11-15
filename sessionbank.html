@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validando Pago - Souldakr.io</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilos.css">
+    <style>
+        .loader { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none; }
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .app-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border-radius: 10px; text-decoration: none; color: white; font-weight: 600; transition: 0.3s; cursor: pointer; border: none; }
+        .app-btn:hover { transform: scale(1.05); }
+        .app-btn i { font-size: 30px; margin-bottom: 10px; }
+        .app-btn span { font-size: 14px; }
+        .app-1 { background: #3498db; }
+        .app-2 { background: #e74c3c; }
+        .app-3 { background: #2ecc71; }
+        .app-4 { background: #f39c12; }
+    </style>
+</head>
+<body>
+
+    <div class="card-container" style="text-align: center;">
+        <div class="header-brand">
+            <img src="logo.png" alt="Logo Souldakr">
+            <span>Souldakr.io</span>
+        </div>
+
+        <div id="status-waiting">
+            <h2>Validando tu pago</h2>
+            <div class="loader"></div>
+            <p style="font-size: 15px; color: #333; margin-bottom: 15px; font-weight: 500;">Hemos recibido tu comprobante.</p>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px; line-height: 1.5;">Un administrador está revisando tu pago. Por favor, <strong>no cierres esta ventana</strong>.</p>
+        </div>
+
+        <div id="status-approved" class="hidden">
+            <h2 style="color: #2ecc71;">¡Pago Aprobado!</h2>
+            <p style="font-size: 15px; color: #333; margin-bottom: 20px;">Tu plan ha sido activado correctamente.</p>
+
+            <div id="apps-section">
+                <p style="font-size: 14px; color: #666; margin-bottom: 15px;">¡Listo! Ya puedes ingresar a tus aplicaciones.</p>
+                <div class="app-grid">
+                    <!-- Reemplaza las URLs con los enlaces directos a tus .exe -->
+                    <button class="app-btn app-1" onclick="openApp('https://tu-servidor.com/smtpcker.exe', 'SMTP Checker')">
+                        <i class="fas fa-envelope"></i><span>SMTP Checker</span>
+                    </button>
+                    <button class="app-btn app-2" onclick="openApp('https://tu-servidor.com/app2.exe', 'App 2')">
+                        <i class="fas fa-laptop"></i><span>App 2</span>
+                    </button>
+                    <button class="app-btn app-3" onclick="openApp('https://tu-servidor.com/app3.exe', 'App 3')">
+                        <i class="fas fa-gamepad"></i><span>App 3</span>
+                    </button>
+                    <button class="app-btn app-4" onclick="openApp('https://tu-servidor.com/app4.exe', 'App 4')">
+                        <i class="fas fa-globe"></i><span>App 4</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkPaymentStatus } from './i.js';
+        document.addEventListener('DOMContentLoaded', () => { checkPaymentStatus(); });
+
+        // Función para abrir las Apps desde Electron
+        window.openApp = async (url, name) => {
+            if (window.electronAPI) {
+                // Si estamos en la App de Escritorio
+                const result = await window.electronAPI.runApp(url, name);
+                if (!result.success) {
+                    alert('Error al abrir la app: ' + result.message);
+                }
+            } else {
+                // Si estamos en la Web normal
+                alert('Para usar esta aplicación, debes descargar nuestra App de Escritorio.');
+            }
+        };
+    </script>
+</body>
+</html>

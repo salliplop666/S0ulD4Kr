@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Souldakr.io</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .user-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+        .user-text h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #000;
+        }
+        .user-text p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+        .plan-info {
+            text-align: right;
+        }
+        .plan-info .time {
+            font-weight: bold;
+            color: #2ecc71;
+            font-size: 14px;
+        }
+        .plan-info .label {
+            font-size: 10px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <!-- Encabezado con Logo, Nombre y Tiempo de Plan -->
+        <div class="user-header">
+            <div class="user-info">
+                <img src="logo.png" alt="Logo Souldakr">
+                <div class="user-text">
+                    <h3 id="user-name">Cargando...</h3>
+                    <p id="user-email">...</p>
+                </div>
+            </div>
+            <div class="plan-info">
+                <div class="time" id="plan-time">---</div>
+                <div class="label">Tiempo restante</div>
+            </div>
+        </div>
+
+        <h1 style="font-size: 24px; margin-bottom: 15px; text-align: center;">Bienvenido</h1>
+        
+        <!-- Sección de estado del plan -->
+        <div id="plan-status-section">
+            <p style="text-align: center; color: #666;">Cargando estado del plan...</p>
+        </div>
+        
+        <div class="links" style="margin-top: 30px;">
+            <a href="#" onclick="sessionStorage.clear(); window.location.href='index.html';">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkUserAccess, checkSession, getUserInfo } from './i.js';
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
+        const auth = getAuth();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 1. Iniciar verificación de sesión única
+            checkSession();
+
+            // 2. Obtener info del usuario (nombre y plan)
+            const userInfo = await getUserInfo();
+            if (userInfo) {
+                document.getElementById('user-name').textContent = userInfo.name;
+                document.getElementById('user-email').textContent = userInfo.email;
+                document.getElementById('plan-time').textContent = userInfo.remainingTime;
+            }
+
+            // 3. Verificar estado del plan para mostrar botones
+            const statusSection = document.getElementById('plan-status-section');
+            
+            try {
+                const status = await checkUserAccess();
+
+                if (!status) {
+                    statusSection.innerHTML = `<p style="text-align: center; color: red;">Error: No se pudo verificar el estado.</p>`;
+                    return;
+                }
+
+                if (status.error === 'Timeout') {
+                    statusSection.innerHTML = `<p style="text-align: center; color: orange;">La conexión está lenta. <a href="dashboard.html">Recargar</a></p>`;
+                    return;
+                }
+
+                if (status.isAdmin) {
+                    statusSection.innerHTML = `
+                        <div class="plan-active-card" style="background: #e0f0ff; border-color: #3498db;">
+                            <h3 style="color: #3498db;">Acceso de Administrador</h3>
+                            <p>Tienes acceso total al sistema.</p>
+                        </div>
+                        <a href="apps.html" class="btn-submit" style="text-decoration: none; background: #2ecc71; margin-top: 15px;">Ir a las Aplicaciones</a>
+                    `;
+                } else if (status.hasPlan) {
+                    statusSection.innerHTML = `
+                        <div class="plan-active-card">
+                            <h3><i class="fas fa-check-circle"></i> Plan Activo</h3>
+                            <p>Tu plan está vigente.</p>
+                        </div>
+                        <a href="apps.html" class="btn-submit" style="text-decoration: none; background: #2ecc71; margin-top: 15px;">Ir a las Aplicaciones</a>
+                    `;
+                } else {
+                    statusSection.innerHTML = `
+                        <div class="plan-inactive-card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Sin Plan Activo</h3>
+                            <p>No tienes un plan activo o tu plan ha expirado.</p>
+                        </div>
+                        <a href="plan.html" class="btn-submit" style="text-decoration: none; margin-top: 15px;">Comprar un Plan</a>
+                    `;
+                }
+            } catch (error) {
+                console.error("Error al verificar plan:", error);
+                statusSection.innerHTML = `<p style="text-align: center; color: red;">Error de conexión. <a href="dashboard.html">Recargar</a></p>`;
+            }
+        });
+    </script>
+</body>
+</html>

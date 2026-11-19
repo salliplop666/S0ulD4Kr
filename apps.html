@@ -66,7 +66,6 @@
         }
         .taskbar-item:hover { background: #6c5ce7; }
         
-        /* Ocultar barra de tareas si no hay apps minimizadas */
         .hidden { display: none !important; }
     </style>
 </head>
@@ -81,7 +80,8 @@
         <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Selecciona la aplicación que deseas abrir.</p>
 
         <div class="app-grid">
-            <button class="app-btn app-1" onclick="openWindow('smtp', 'SMTP Checker', 'https://chekersmtp.onrender.com/')">
+            <!-- Aseguramos que las URLs estén correctas y sean HTTPS -->
+            <button class="app-btn app-1" onclick="openWindow('smtp', 'SMTP Checker', 'https://souldakr-io.onrender.com/')">
                 <i class="fas fa-envelope"></i>
                 <span>SMTP Checker</span>
             </button>
@@ -117,24 +117,24 @@
         const auth = getAuth();
         let windowCount = 0;
 
-        // Bloqueo de inspección
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key === 'U')) e.preventDefault();
-        });
-
+        // Validación de acceso al cargar la página
         onAuthStateChanged(auth, async (user) => {
-            if (!user) { window.location.href = 'login.html'; return; }
+            if (!user) { 
+                window.location.href = 'login.html'; 
+                return; 
+            }
+            
             checkSession();
             const status = await checkUserAccess();
+            
             if (!status || (!status.hasPlan && !status.isAdmin)) {
-                alert('No tienes un plan activo.'); window.location.href = 'plan.html';
+                alert('No tienes un plan activo o ha expirado.'); 
+                window.location.href = 'plan.html';
             }
         });
 
-        // Función para crear una ventana flotante
+        // Función para crear una ventana flotante de forma segura
         window.openWindow = (id, title, url) => {
-            // Si ya existe, la traemos al frente
             const existing = document.getElementById(`win-${id}`);
             if (existing) {
                 existing.style.display = 'flex';
@@ -147,10 +147,12 @@
             win.className = 'window';
             win.style.zIndex = ++windowCount;
             
-            // Posición aleatoria para que no se superpongan exactamente
+            // Posición en cascada para no superponerse
             win.style.top = `${10 + (windowCount * 2)}%`;
             win.style.left = `${10 + (windowCount * 2)}%`;
 
+            // SEGURIDAD: Se añade el atributo sandbox al iframe.
+            // Evita que la web externa robe datos de sesión o redirija la ventana principal.
             win.innerHTML = `
                 <div class="window-header" onmousedown="startDrag(event, 'win-${id}')">
                     <span class="window-title">${title}</span>
@@ -159,17 +161,16 @@
                         <button class="close" onclick="closeWindow('win-${id}')"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <iframe class="window-content" src="${url}"></iframe>
+                <iframe class="window-content" src="${url}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
             `;
             document.getElementById('windows-container').appendChild(win);
         };
 
-        // Minimizar ventana
+        // Minimizar ventana a la barra de tareas
         window.minimizeWindow = (id) => {
             const win = document.getElementById(id);
             if (win) win.style.display = 'none';
             
-            // Agregar a la barra de tareas si no está
             const taskbar = document.getElementById('taskbar');
             if (!document.getElementById(`task-${id}`)) {
                 const task = document.createElement('div');
@@ -191,6 +192,7 @@
         window.closeWindow = (id) => {
             const win = document.getElementById(id);
             if (win) win.remove();
+            
             const task = document.getElementById(`task-${id}`);
             if (task) {
                 task.remove();
@@ -200,7 +202,7 @@
             }
         };
 
-        // Lógica de arrastre (Drag)
+        // Lógica de arrastre (Drag & Drop)
         let dragTarget = null;
         let offsetX = 0, offsetY = 0;
 
